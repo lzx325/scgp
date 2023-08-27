@@ -46,3 +46,9 @@ from scgp.scgp_extension import (
     make_pseudo_nodes,
     SCGPExtension_wrapper,
 )
+
+from scgp.plot import (
+    plot_all_regions_with_annotations,
+    plot_region,
+    plot_heatmap,
+)

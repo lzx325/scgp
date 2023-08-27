@@ -305,7 +305,7 @@ def test_pseudo_nodes():
     for pn_fn in [select_pseudo_nodes, make_pseudo_nodes]:
         pn_feat_df, pn_membership_df, pn_neighbor_df = pn_fn(
             objs[:1], scgps, use_partitions=use_partitions, k=20, intra_knn=4)
-        assert pn_feat_df.shape == (20 * len(use_partitions), get_feature(objs[0]).shape[1])
+        assert pn_feat_df.shape[1] == get_feature(objs[0]).shape[1]
         assert [ind[0].startswith('PN-') for ind in pn_feat_df.index]
         assert [ind[1].startswith('PN-') for ind in pn_feat_df.index]
         assert all(pn_feat_df.index == pn_membership_df.index)

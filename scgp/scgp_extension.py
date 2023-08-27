@@ -65,7 +65,10 @@ def select_pseudo_nodes(objs,
     """
     objs = [objs] if not isinstance(objs, list) else objs
 
-    use_partitions = set(use_partitions) if use_partitions is not None else set(list(membership_dict.values()))
+    if use_partitions is None:
+        use_partitions = set(list(membership_dict.values())) - set([-1])  # Excluding outlying class
+    else:
+        use_partitions = set(use_partitions)
     feats_by_partition = {v: [] for v in use_partitions}
     nodes_by_partition = {v: [] for v in use_partitions}
 
@@ -151,7 +154,10 @@ def make_pseudo_nodes(objs,
     """
     objs = [objs] if not isinstance(objs, list) else objs
 
-    use_partitions = set(use_partitions) if use_partitions is not None else set(list(membership_dict.values()))
+    if use_partitions is None:
+        use_partitions = set(list(membership_dict.values())) - set([-1])  # Excluding outlying class
+    else:
+        use_partitions = set(use_partitions)
     feats_by_partition = {v: [] for v in use_partitions}
     nodes_by_partition = {v: [] for v in use_partitions}
 
@@ -225,7 +231,7 @@ def map_to_pseudo_nodes(query_feat_df, ref_dfs, knn=5):
     return query_membership
 
 
-def build_sample_reference_edges(query_feat_df, ref_feat_df, inter_knn=4, ratio=0.5):
+def build_sample_reference_edges(query_feat_df, ref_feat_df, inter_knn=3, ratio=0.5):
     """Extract reference-query nearest neighbor feature edges
 
     Args:
@@ -269,8 +275,8 @@ def SCGPExtension_wrapper(query_objs,
                           delaunay_distance_cutoff=35,
                           pixel_resolution=0.3775,
                           rp=1e-3,
-                          intra_feature_knn=5,
-                          inter_feature_knn=4,
+                          intra_feature_knn=3,
+                          inter_feature_knn=3,
                           ratio=0.5,
                           continuity_level=0):
     """ Wrapper function for SCGP-Extension
