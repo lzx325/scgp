@@ -1,0 +1,11 @@
+numpy
+scipy
+pandas
+networkx
+scikit-learn
+matplotlib
+umap-learn
+igraph
+leidenalg
+anndata
+emobject >= 0.7.3
