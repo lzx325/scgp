@@ -16,7 +16,7 @@ This is an example code base for manuscript "Characterizing Tissue Structures Fr
 
 See `Example.ipynb` for a tutorial of using SCGP and SCGP-Extension on regions from the DKD Kidney dataset
 
-Use the `pytest`` package to run the test suite:
+Use the `pytest` package to run the test suite:
 ```
 $ pytest scgp/unit_tests.py
 ```
