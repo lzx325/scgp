@@ -1,6 +1,6 @@
 # Spatial Cellular Graph Partition (SCGP)
 
-This is an example code base for manuscript "Characterizing Tissue Structures From Spatial Omics with Spatial Cellular Graph Partition." DOI: [DOI missing](https://doi.org/10.1101/2022.05.12.491707)
+This is an example code base for manuscript "Characterizing Tissue Structures From Spatial Omics with Spatial Cellular Graph Partition." DOI: [10.1101/2023.09.05.556133](https://doi.org/10.1101/2023.09.05.556133)
 
 ![SCGP_Image](https://gitlab.com/enable-medicine-public/scgp/uploads/a367f04dfd871d10d9f35e91312f9f24/Artboard_1gitlab_page.png)
 
