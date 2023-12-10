@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import scipy
 import warnings
 from copy import deepcopy
 
@@ -150,6 +151,7 @@ def construct_object(
         adata.obs["X"] = list(coord_df.loc[indices, "X"])
         adata.obs["Y"] = list(coord_df.loc[indices, "Y"])
         adata.uns["name"] = region_id
+        adata.obsm["spatial"] = np.array(coord_df.loc[indices, ["X", "Y"]])
         if cell_annotation_df is not None:
             for col in ann_df.columns:
                 adata.obs[col] = list(ann_df.loc[indices, col])
@@ -409,6 +411,21 @@ def assign_neighborhood(obj, neighbor_df, neighbor_type='spatial'):
 
     if type(obj).__name__ == 'AnnData':
         obj.obs['neighbors-%s' % neighbor_type] = neighbor_df[neighbor_df.columns[0]]
+
+        # For compatibility with squidpy
+        row_ind = []
+        col_ind = []
+        cell_id_mapping = {cid: i for i, cid in enumerate(get_cell_ids(obj))}
+        for cid, neighbor_cell_ids in neighbor_df.iterrows():
+            for n_cid in neighbor_cell_ids.item():
+                row_ind.append(cell_id_mapping[cid])
+                col_ind.append(cell_id_mapping[n_cid])
+
+        num_cells = len(get_cell_ids(obj))
+        connectivity_mat = scipy.sparse.csr_matrix(
+            ([1]*len(row_ind), (row_ind, col_ind)), shape=(num_cells, num_cells))
+        obj.obsp['%s_connectivities' % neighbor_type] = connectivity_mat
+
     elif type(obj).__name__ == 'EMObject':
         neighbor_col_name = neighbor_type
         if hasattr(obj, 'neighbors'):
