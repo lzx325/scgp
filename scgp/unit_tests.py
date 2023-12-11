@@ -121,7 +121,7 @@ def test_construct_spatial_neighborhood():
             cell_annotation_df=None,
             index_col='CELL_ID',
             mode=mode)
-        
+
         for find_neighbor_fn in [
                 build_distance_neighborhood,
                 build_knn_neighborhood,
@@ -301,7 +301,7 @@ def test_pseudo_nodes():
     objs = load_test_objects()
     scgps, _ = SCGP_wrapper(objs[:1], rp=1e-3)
     use_partitions = set(v for v in scgps.values() if v >= 0)  # -1 is unknown
-    
+
     for pn_fn in [select_pseudo_nodes, make_pseudo_nodes]:
         pn_feat_df, pn_membership_df, pn_neighbor_df = pn_fn(
             objs[:1], scgps, use_partitions=use_partitions, k=20, intra_knn=4)

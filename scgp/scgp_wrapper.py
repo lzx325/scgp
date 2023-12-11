@@ -15,6 +15,7 @@ from scgp.object_io import (
     get_normed_biomarker_expression,
     get_feature,
     extract_feature_neighborhood_with_region_cell_ids,
+    assign_annotation_dict_to_objects,
 )
 from scgp.features import (
     calculate_feature,
@@ -456,7 +457,8 @@ def SCGP_wrapper(objs,
                  pixel_resolution=0.3775,
                  rp=1e-3,
                  feature_knn=5,
-                 continuity_level=0):
+                 continuity_level=0,
+                 attach_to_object=True):
     """Wrapper function for SCGP
 
     Args:
@@ -474,6 +476,8 @@ def SCGP_wrapper(objs,
             feature space
         continuity_level (int, optional): continuity level for post partition
             smoothing, see `scgp.partition.smooth_spatially_isolated_patch`
+        attach_to_object (bool, optional): if to attach the resulting SCGP
+            partitions to the input region object(s).
 
     Returns:
         dict: dict of cell(node) name: SCGP partition id
@@ -532,4 +536,7 @@ def SCGP_wrapper(objs,
     t_c = time.time()
     if verbose:
         print("Featurization takes %.2fs, Clustering takes %.2fs" % (t_f - t0, t_c - t_f))
+    if attach_to_object:
+        assign_annotation_dict_to_objects(
+            scgp_membership, objs, name='SCGP_annotation', categorical=True)
     return scgp_membership, ((features, all_neighbors_df), nx_graph)

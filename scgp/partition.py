@@ -202,7 +202,7 @@ def generic_clustering(feature_df, method='KMeans', method_kwargs={'n_clusters':
         original_membership, graph = leiden_clustering(feature_ar, **method_kwargs)
         membership = remove_isolated_patch(original_membership)
         model = graph
-    
+
     else:
         raise ValueError("Method %s not supported" % method)
 

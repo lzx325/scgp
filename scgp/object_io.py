@@ -110,7 +110,7 @@ def construct_object(
     """
     assert index_col in biomarker_expression_df
     assert index_col in cell_seg_df
-    
+
     # cell index with string type
     cell_seg_df[index_col] = cell_seg_df[index_col].astype(str)
     biomarker_expression_df[index_col] = biomarker_expression_df[index_col].astype(str)
@@ -138,7 +138,7 @@ def construct_object(
 
         ann_df = cell_annotation_df.set_index(index_col)
         ann_df = ann_df.loc[indices]
-    
+
     if mode == 'anndata':
         import anndata as ad
         X = np.array(bm_exp_df)
@@ -146,7 +146,9 @@ def construct_object(
         adata.obs_names = indices
         adata.var_names = columns
         if normalize_fn is None:
-            normalize_fn = lambda x: x
+            def identity(x):
+                return x
+            normalize_fn = identity
         adata.layers["normalized"] = np.array(normalize_fn(bm_exp_df))
         adata.obs["X"] = list(coord_df.loc[indices, "X"])
         adata.obs["Y"] = list(coord_df.loc[indices, "Y"])
@@ -423,7 +425,7 @@ def assign_neighborhood(obj, neighbor_df, neighbor_type='spatial'):
 
         num_cells = len(get_cell_ids(obj))
         connectivity_mat = scipy.sparse.csr_matrix(
-            ([1]*len(row_ind), (row_ind, col_ind)), shape=(num_cells, num_cells))
+            ([1] * len(row_ind), (row_ind, col_ind)), shape=(num_cells, num_cells))
         obj.obsp['%s_connectivities' % neighbor_type] = connectivity_mat
 
     elif type(obj).__name__ == 'EMObject':
@@ -489,7 +491,10 @@ def assign_annotation(obj, annotation_df, name='new_annotation'):
     return
 
 
-def assign_annotation_dict_to_objects(annotation_dict, objs, name='new_annotation'):
+def assign_annotation_dict_to_objects(annotation_dict,
+                                      objs,
+                                      name='new_annotation',
+                                      categorical=False):
     """Assign an annotation dictionary to regions
 
     Args:
@@ -497,6 +502,7 @@ def assign_annotation_dict_to_objects(annotation_dict, objs, name='new_annotatio
             {(region id, cell id): annotation}
         objs (list): list of region objects
         name (str): annotation name
+        categorical (bool): if the annotation is categorical
     """
     objs = [objs] if not isinstance(objs, list) else objs
     for obj in objs:
@@ -504,6 +510,8 @@ def assign_annotation_dict_to_objects(annotation_dict, objs, name='new_annotatio
         cell_ids = get_cell_ids(obj)
         annotation_as_list = [[annotation_dict[(region_id, cell_id)]] for cell_id in cell_ids]
         annotation_df = pd.DataFrame(np.array(annotation_as_list), index=cell_ids, columns=[name])
+        if categorical:
+            annotation_df[name] = annotation_df[name].astype('category')
         assign_annotation(obj, annotation_df, name=name)
     return
 
