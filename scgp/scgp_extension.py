@@ -16,6 +16,7 @@ from scgp.object_io import (
     has_feature,
     get_feature,
     extract_feature_neighborhood_with_region_cell_ids,
+    assign_annotation_dict_to_objects,
 )
 from scgp.neighborhood import (
     build_feature_knn_umap,
@@ -278,7 +279,9 @@ def SCGPExtension_wrapper(query_objs,
                           intra_feature_knn=3,
                           inter_feature_knn=3,
                           ratio=0.5,
-                          continuity_level=0):
+                          smooth_level=0,
+                          smooth_iter=1,
+                          attach_to_object=True):
     """ Wrapper function for SCGP-Extension
 
     Args:
@@ -295,18 +298,21 @@ def SCGPExtension_wrapper(query_objs,
         pixel_resolution (float, optional): length (in um) per pixel.
         rp (float, optional): resolution parameter for leiden partition.
         intra_feature_knn (int, optional): number of nearest neighbors to consider
-            for feature edges between query nodes
+            for feature edges between query nodes.
         inter_feature_knn (int, optional): number of nearest neighbors to consider
-            for reference-query feature edges
+            for reference-query feature edges.
         ratio (float, optional): subsample ratio of reference-query feature edges,
             these edges will be ranked based on similarity and the `ratio` most
             similar edges will be kept. Should be between 0 and 1.
-        continuity_level (int, optional): continuity level for post partition
-            smoothing, see `scgp.partition.smooth_spatially_isolated_patch`
+        smooth_level (int, optional): smooth level for post partition
+            smoothing, see `scgp.partition.smooth_spatially_isolated_patch`.
+        smooth_iter (int, optional): number of smoothing runs.
+        attach_to_object (bool, optional): if to attach the resulting SCGPExt
+            partitions to the input region object(s).
 
     Returns:
-        dict: dict of cell(node) name: SCGP-Extension partition id
-        tuple: tuple of features and model used for reproduction or finetuning
+        dict: dict of cell(node) name: SCGP-Extension partition id.
+        tuple: tuple of features and model used for reproduction or finetuning.
     """
     query_objs = [query_objs] if not isinstance(query_objs, list) else query_objs
     bms = get_biomarkers(query_objs[0])
@@ -367,22 +373,57 @@ def SCGPExtension_wrapper(query_objs,
     is_membership_fixed = [0] * query_feat_df.shape[0] + [1] * pn_feat_df.shape[0]
     initial_membership = map_to_pseudo_nodes(
         query_feat_df, ref_dfs, knn=5) + list(np.array(pn_membership_df).flatten())
+    
+    # Run partition
+    feats = (query_feat_df, query_spatial_neighbor_df)
+    model = (joint_graph, is_membership_fixed, initial_membership)
+    query_gp = SCGPExtension_partition(
+        feats, model, rp=rp, smooth_level=smooth_level, smooth_iter=smooth_iter, verbose=verbose)
 
-    # Partition and post-processing
+    t_c = time.time()
+    if verbose:
+        print("Featurization takes %.2fs, Clustering takes %.2fs" % (t_f - t0, t_c - t_f))
+
+    if attach_to_object:
+        assign_annotation_dict_to_objects(
+            query_gp, query_objs, name='SCGPExt_annotation', categorical=True)
+    return query_gp, (feats, model)
+
+
+def SCGPExtension_partition(feats,
+                            model,
+                            rp=1e-3,
+                            smooth_level=0,
+                            smooth_iter=1,
+                            verbose=False):
+    """Partitioning the joint graph defined by SCGPExt
+
+    Args:
+        feats (tuple): tuple of feature and neighborhood data frames.
+        model (tuple): the joint graph of query nodes and pseudo-nodes from reference.
+        rp (float, optional): resolution parameter for leiden partition.
+        smooth_level (int, optional): smooth level for post partition
+            smoothing, see `scgp.partition.smooth_spatially_isolated_patch`.
+        smooth_iter (int, optional): number of smoothing runs.
+
+    Returns:
+        dict: dict of cell(node) name: SCGP-Extension partition id.
+    """
+    
+    query_feat_df, query_spatial_neighbor_df = feats
+    joint_graph, is_membership_fixed, initial_membership = model
+
     combined_membership = leiden_partition_with_reference(
         joint_graph, initial_membership=initial_membership, is_membership_fixed=is_membership_fixed, rp=rp)
     query_membership = combined_membership[:query_feat_df.shape[0]]
 
     query_membership = remove_isolated_patch(query_membership)
-    query_membership = smooth_spatially_isolated_patch(
-        query_spatial_neighbor_df, query_membership, continuity_level=continuity_level)
+    for _ in range(smooth_iter):
+        query_membership = smooth_spatially_isolated_patch(
+            query_spatial_neighbor_df, query_membership, smooth_level=smooth_level)
     query_membership = remove_isolated_patch(query_membership)
     if verbose:
         print("Find %d partitions" % (len(set(query_membership)) - 1))  # Remove unknown
 
     query_gp = membership_to_membership_dict(query_membership, query_feat_df)
-    t_c = time.time()
-    if verbose:
-        print("Featurization takes %.2fs, Clustering takes %.2fs" % (t_f - t0, t_c - t_f))
-    return query_gp, ((query_feat_df, query_spatial_neighbor_df),
-                      (joint_graph, is_membership_fixed, initial_membership))
+    return query_gp

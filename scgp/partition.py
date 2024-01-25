@@ -118,7 +118,7 @@ def remove_isolated_patch(membership):
     return list(membership)
 
 
-def smooth_spatially_isolated_patch(neighbor_df, membership, continuity_level=0):
+def smooth_spatially_isolated_patch(neighbor_df, membership, smooth_level=0):
     """Spatial smoothing for partition/clustering
 
     This method looks for cells who have different partitions from their
@@ -129,7 +129,7 @@ def smooth_spatially_isolated_patch(neighbor_df, membership, continuity_level=0)
     Args:
         neighbors (pd.DataFrame): (spatial) neighborhood dataframe
         membership (list): cluster assignment/partition of nodes in the graph
-        continuity_level (int): threshold for smoothing, node membership will
+        smooth_level (int): threshold for smoothing, node membership will
             be altered if the number of its neighbors sharing the same membership
             is smaller than this value.
 
@@ -147,7 +147,7 @@ def smooth_spatially_isolated_patch(neighbor_df, membership, continuity_level=0)
         self_id = membership_dict[cell_id]
         neighbor_ids = [membership_dict[n] for n in ns if n != cell_id]
         if len(neighbor_ids) >= 2:
-            if self_id not in neighbor_ids or neighbor_ids.count(self_id) <= continuity_level:
+            if self_id not in neighbor_ids or neighbor_ids.count(self_id) <= smooth_level:
                 membership_dict[cell_id] = majority_of_list([i for i in neighbor_ids if i != -1])
 
     membership = [membership_dict[cell_id] for cell_id in all_neighbors.index]

@@ -457,7 +457,8 @@ def SCGP_wrapper(objs,
                  pixel_resolution=0.3775,
                  rp=1e-3,
                  feature_knn=5,
-                 continuity_level=0,
+                 smooth_level=0,
+                 smooth_iter=1,
                  attach_to_object=True):
     """Wrapper function for SCGP
 
@@ -474,8 +475,9 @@ def SCGP_wrapper(objs,
         rp (float, optional): resolution parameter for leiden partition.
         feature_knn (int, optional): number of nearest neighbors in the
             feature space
-        continuity_level (int, optional): continuity level for post partition
+        smooth_level (int, optional): smooth level for post partition
             smoothing, see `scgp.partition.smooth_spatially_isolated_patch`
+        smooth_iter (int, optional): number of smoothing runs
         attach_to_object (bool, optional): if to attach the resulting SCGP
             partitions to the input region object(s).
 
@@ -518,25 +520,52 @@ def SCGP_wrapper(objs,
         n_spatial_edges = count_edges_in_neighborhood(all_neighbors_df[['spatial']])
         n_feature_edges = count_edges_in_neighborhood(all_neighbors_df[['feature']])
         print("Use %d spatial edges and %d feature edges" % (n_spatial_edges, n_feature_edges))
-    t_f = time.time()
 
+    t_f = time.time()
     nx_graph = construct_graph(
         all_neighbors_df, feature_df=features, weighted=True, normalize=True)
+    scgp_membership = SCGP_partition(
+        (features, all_neighbors_df), nx_graph, rp=rp, smooth_level=smooth_level,
+        smooth_iter=smooth_iter, verbose=verbose)
+    t_c = time.time()
+    if verbose:
+        print("Featurization takes %.2fs, Clustering takes %.2fs" % (t_f - t0, t_c - t_f))
 
+    if attach_to_object:
+        assign_annotation_dict_to_objects(
+            scgp_membership, objs, name='SCGP_annotation', categorical=True)
+    return scgp_membership, ((features, all_neighbors_df), nx_graph)
+
+
+def SCGP_partition(feats,
+                   nx_graph,
+                   rp=1e-3,
+                   smooth_level=1,
+                   smooth_iter=0,
+                   verbose=False):
+    """Partitioning hybrid graphs defined by SCGP
+
+    Args:
+        feats (tuple): tuple of feature and neighborhood data frames.
+        nx_graph (nx.Graph): hybrid graph representatino of region(s).
+        rp (float, optional): resolution parameter for leiden partition.
+        smooth_level (int, optional): smooth level for post partition
+            smoothing, see `scgp.partition.smooth_spatially_isolated_patch`.
+        smooth_iter (int, optional): number of smoothing runs.
+
+    Returns:
+        dict: dict of cell(node) name: SCGP partition id
+    """
+    features, all_neighbors_df = feats
     membership = leiden_partition(nx_graph, rp=rp)
     membership = remove_isolated_patch(membership)
-    membership = smooth_spatially_isolated_patch(
-        all_neighbors_df[['spatial']], membership, continuity_level=continuity_level)
+    for _ in range(smooth_iter):
+        membership = smooth_spatially_isolated_patch(
+            all_neighbors_df[['spatial']], membership, smooth_level=smooth_level)
     membership = remove_isolated_patch(membership)
     if verbose:
         print("Find %d partitions" % (len(set(membership)) - 1))  # Remove unknown
 
     # Define cell type dict
     scgp_membership = membership_to_membership_dict(membership, features)
-    t_c = time.time()
-    if verbose:
-        print("Featurization takes %.2fs, Clustering takes %.2fs" % (t_f - t0, t_c - t_f))
-    if attach_to_object:
-        assign_annotation_dict_to_objects(
-            scgp_membership, objs, name='SCGP_annotation', categorical=True)
-    return scgp_membership, ((features, all_neighbors_df), nx_graph)
+    return scgp_membership

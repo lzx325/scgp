@@ -39,12 +39,14 @@ from scgp.scgp_wrapper import (
     SpaGCN_multi_regions_wrapper,
     SpaGCN_wrapper,
     SCGP_wrapper,
+    SCGP_partition,
 )
 
 from scgp.scgp_extension import (
     select_pseudo_nodes,
     make_pseudo_nodes,
     SCGPExtension_wrapper,
+    SCGPExtension_partition,
 )
 
 from scgp.plot import (
@@ -52,3 +54,5 @@ from scgp.plot import (
     plot_region,
     plot_heatmap,
 )
+
+from scgp.version import __version__
