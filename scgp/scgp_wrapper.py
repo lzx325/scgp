@@ -540,8 +540,8 @@ def SCGP_wrapper(objs,
 def SCGP_partition(feats,
                    nx_graph,
                    rp=1e-3,
-                   smooth_level=1,
-                   smooth_iter=0,
+                   smooth_level=0,
+                   smooth_iter=1,
                    verbose=False):
     """Partitioning hybrid graphs defined by SCGP
 
