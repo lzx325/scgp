@@ -164,7 +164,7 @@ def UTAG_wrapper(objs,
                  verbose=True,
                  exclude_features=[],
                  feature_weights={},
-                 neighbor_distance_cutoff=18,
+                 neighbor_distance_cutoff=20,
                  pixel_resolution=0.3775,
                  method='Leiden',
                  method_kwargs={'rp': 0.2, 'k': 20}):
@@ -178,7 +178,7 @@ def UTAG_wrapper(objs,
         feature_weights (dict, optional): dict of feature weights.
             See `features.reweigh_features` for details.
         neighbor_distance_cutoff (float, optional): distance cutoff (in um) for
-            defining spatial neighborhood. Defaults to 18.
+            defining spatial neighborhood. Defaults to 20.
         pixel_resolution (float, optional): length (in um) per pixel.
         method (str, optional): clustering method. Defaults to 'KMeans'.
         method_kwargs (dict, optional): clustering kwargs. Defaults to {'n_clusters': 6}.
@@ -228,7 +228,7 @@ def SLDA_wrapper(objs,
                  verbose=True,
                  exclude_features=[],
                  feature_weights={},
-                 neighbor_distance_cutoff=30,
+                 neighbor_distance_cutoff=20,
                  pixel_resolution=0.3775,
                  unique_cell_types=None,
                  n_topics=6,
@@ -246,7 +246,7 @@ def SLDA_wrapper(objs,
         feature_weights (dict, optional): dict of feature weights.
             See `features.reweigh_features` for details.
         neighbor_distance_cutoff (float, optional): distance cutoff (in um) for
-            defining spatial neighborhood. Defaults to 18.
+            defining spatial neighborhood. Defaults to 20.
         pixel_resolution (float, optional): length (in um) per pixel.
         unique_cell_types (list, optional): list of unique cell types. Defaults to None.
         n_topics (int, optional): Number of LDA topics. Defaults to 6.

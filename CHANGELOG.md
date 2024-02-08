@@ -16,3 +16,7 @@
 - Separate the partition codes from `SCGP_wrapper` and `SCGPExtension_wrapper`
 - Add function `SCGP_partition` and `SCGPExtension_partition` to allow easier rerunning and tuning
 
+### 0.3.2
+
+- Change default parameter settings
+
