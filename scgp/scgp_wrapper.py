@@ -234,6 +234,7 @@ def SLDA_wrapper(objs,
                  n_topics=6,
                  difference_penalty=0.1,
                  n_parallel_processes=multiprocessing.cpu_count(),
+                 n_iters=3,
                  admm_rho=0.1,
                  primal_dual_mu=2):
     """Wrapper function for generating Spatial LDA clusters
@@ -252,6 +253,7 @@ def SLDA_wrapper(objs,
         n_topics (int, optional): Number of LDA topics. Defaults to 6.
         difference_penalty (float, optional): prior for similarity between neighboring cells. Defaults to 0.1.
         n_parallel_processes (int, optional): Number of parallel processes.
+        n_iters (int, optional): Number of iterations.
         admm_rho (float, optional): optimization parameters. Defaults to 0.1.
         primal_dual_mu (float, optional): optimization parameters. Defaults to 2.
 
@@ -304,6 +306,7 @@ def SLDA_wrapper(objs,
                   n_topics=n_topics,
                   difference_penalty=difference_penalty,
                   n_parallel_processes=n_parallel_processes,
+                  n_iters=n_iters,
                   admm_rho=admm_rho,
                   primal_dual_mu=primal_dual_mu)
 
