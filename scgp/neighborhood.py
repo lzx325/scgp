@@ -208,7 +208,10 @@ def build_feature_knn_umap(features, k=10, seed=123, attach_to_object=False):
         cell_ids = get_cell_ids(features)
 
     feature_neighbors = [[] for _ in range(feature_ar.shape[0])]
-
+    if k == 0:
+        feature_neighbor_df = pd.DataFrame({"feature": feature_neighbors}, index=cell_ids)
+        return feature_neighbor_df
+        
     knn_indices, knn_dists, forest = nearest_neighbors(
         X=feature_ar,
         n_neighbors=k,
