@@ -160,16 +160,13 @@ def plot_heatmap(annotation_dict, objs, use_clusters=[], use_features=[], featur
     feature_axis_names = use_features if len(feature_axis_names) == 0 else feature_axis_names
     assert len(feature_axis_names) == len(use_features)
 
-    plt.clf()
-    plt.figure(figsize=(10, 3))
-    plt.imshow(mean_heatmap, vmin=-1.5, vmax=1.5, cmap='bwr')
-    plt.xticks(np.arange(len(use_features)), feature_axis_names, rotation=90)
-    plt.yticks([])
-    plt.show()
-
-    plt.clf()
-    plt.figure(figsize=(1, 3))
-    plt.imshow(np.array(use_clusters).reshape((-1, 1)), cmap='tab20', vmin=0, vmax=19)
-    plt.axis('off')
-    plt.show()
+    f, axes = plt.subplots(1, 2, sharey='all', width_ratios=[50, 1], figsize=(10, 3))
+    axes[0].imshow(mean_heatmap, vmin=-1.5, vmax=1.5, cmap='bwr')
+    axes[0].set_xticks(np.arange(len(use_features)), feature_axis_names, rotation=90)
+    axes[0].set_yticks([])
+    axes[1].imshow(np.array(use_clusters).reshape((-1, 1)), cmap='tab20', vmin=0, vmax=19)
+    axes[1].set_xticks([])
+    axes[1].set_yticks([])
+    plt.tight_layout()
+    f.align_ylabels(axes)
     return mean_heatmap
