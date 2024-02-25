@@ -20,3 +20,7 @@
 
 - Change default parameter settings
 
+### 0.3.3
+
+- Bug fixes
+- Option for using pre-calculated features in SCGP
