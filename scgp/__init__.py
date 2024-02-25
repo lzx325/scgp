@@ -14,6 +14,8 @@ from scgp.object_io import (
     get_cell_annotation,
     has_feature,
     get_feature,
+    assign_neighborhood,
+    assign_features,
     assign_annotation,
     assign_annotation_dict_to_objects,
 )
