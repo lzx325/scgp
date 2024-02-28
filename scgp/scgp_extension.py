@@ -281,6 +281,7 @@ def SCGPExtension_wrapper(query_objs,
                           ratio=0.5,
                           smooth_level=0,
                           smooth_iter=1,
+                          feature_item={'expression': 1},
                           attach_to_object=True):
     """ Wrapper function for SCGP-Extension
 
@@ -307,6 +308,8 @@ def SCGPExtension_wrapper(query_objs,
         smooth_level (int, optional): smooth level for post partition
             smoothing, see `scgp.partition.smooth_spatially_isolated_patch`.
         smooth_iter (int, optional): number of smoothing runs.
+        feature_item (dict, optional): feature item to calculate. Use empty dict
+            to use existing feature dataframe. Defaults to {'expression': 1}.
         attach_to_object (bool, optional): if to attach the resulting SCGPExt
             partitions to the input region object(s).
 
@@ -320,13 +323,14 @@ def SCGPExtension_wrapper(query_objs,
 
     # Query feature and query spatial neighbors
     t0 = time.time()
-    feature_item = {'expression': 1}
     query_feat_df = []
     query_spatial_neighbor_df = []
     for obj in query_objs:
         build_delaunay_triangulation_neighborhood(
             obj, r=delaunay_distance_cutoff, um_per_px=pixel_resolution, attach_to_object=True)
-        calculate_feature(obj, feature_item=feature_item)
+        if len(feature_item) > 0:
+            calculate_feature(obj, feature_item=feature_item)
+        # Extract feature and neighborhood, with rows indexed by (region_id, cell_id)
         feature_df, neighbor_df = extract_feature_neighborhood_with_region_cell_ids(obj)
         feature_df = reweigh_features(
             feature_df,

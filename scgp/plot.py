@@ -36,7 +36,13 @@ def plot_all_regions_with_annotations(annotation_dict,
     for obj in objs:
         region_id = get_name(obj)
         node_gp = [annotation_dict[(region_id, cell_id)] for cell_id in get_cell_ids(obj)]
-        node_colors = [matplotlib.cm.tab20(i % 20) for i in node_gp]
+        if np.issubdtype(type(node_gp[0]), int):
+            node_colors = [matplotlib.cm.tab20(i % 20) for i in node_gp]
+        elif isinstance(node_gp[0], str) and len(node_gp[0]) == 7 and node_gp[0].startswith('#'):
+            node_colors = node_gp
+        else:
+            unique_classes = sorted(set(node_gp))
+            node_colors = [matplotlib.cm.tab20(unique_classes.index(i) % 20) for i in node_gp]
         plt.clf()
         plt.figure(figsize=(figsize, figsize))
         plot_region(obj, node_colors=node_colors, **kwargs)
