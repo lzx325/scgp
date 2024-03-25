@@ -325,7 +325,7 @@ def construct_graph(neighbor_df, feature_df=None, weighted=False, normalize=Fals
         f2 = feature_df.loc[[e[1] for e in all_edges]]
         feature_diff = np.linalg.norm(np.array(f1) - np.array(f2), axis=1, ord=2)
         similarity = 1 / np.clip(feature_diff, 1e-5, np.inf)
-        weights = np.clip(similarity / np.median(similarity), 1e-5, 3)
+        weights = np.clip(similarity / (np.median(similarity) + 1e-5), 1e-5, 3)
     else:
         weights = [1] * len(all_edges)
 
