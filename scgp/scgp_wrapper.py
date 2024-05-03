@@ -413,7 +413,7 @@ def SpaGCN_multi_regions_wrapper(objs,
     return refined_results, ((adata_list, adj_list, l_list), clf)
 
 
-def SpaGCN_wrapper(obj, res=0.4):
+def SpaGCN_wrapper(obj, num_pcs=20, res=0.4, n_neighbors=10):
     """Wrapper function for generating SpaGCN clusters on a single region
 
     Args:
@@ -443,7 +443,7 @@ def SpaGCN_wrapper(obj, res=0.4):
 
     clf = spg.SpaGCN()
     clf.set_l(length_factor)
-    clf.train(adata, adj, num_pcs=20, res=res, tol=5e-3, lr=0.05, max_epochs=200)
+    clf.train(adata, adj, num_pcs=num_pcs, res=res, n_neighbors=n_neighbors, tol=5e-3, lr=0.005, max_epochs=200)
     y_pred, _ = clf.predict()
     refined_pred = spg.refine(sample_id=np.arange(adata.shape[0]), pred=list(y_pred), dis=adj, shape="hexagon")
 
