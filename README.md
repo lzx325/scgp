@@ -1,6 +1,6 @@
 # Spatial Cellular Graph Partition (SCGP)
 
-This is an example code base for manuscript "Characterizing Tissue Structures From Spatial Omics with Spatial Cellular Graph Partition." DOI: [10.1101/2023.09.05.556133](https://doi.org/10.1101/2023.09.05.556133)
+This is the code base for article "Characterizing Tissue Structures From Spatial Omics with Spatial Cellular Graph Partition." DOI: [10.1101/2023.09.05.556133](https://doi.org/10.1101/2023.09.05.556133)
 
 ![SCGP_Image](https://gitlab.com/enable-medicine-public/scgp/uploads/a367f04dfd871d10d9f35e91312f9f24/Artboard_1gitlab_page.png)
 
@@ -23,10 +23,11 @@ $ pytest scgp/unit_tests.py
 
 ## Data Availability
 Datasets used in the SCGP manuscript:
-- DLPFC (Visium): [https://research.libd.org/spatialLIBD/](https://research.libd.org/spatialLIBD/)
-- Healthy Lung IMC: [https://doi.org/10.5281/zenodo.6376766](https://doi.org/10.5281/zenodo.6376766)
-- DKD Kidney: Raw data files stored under `data/DKD_Kidney`
-- TR Kidney, UCSF Derm: currently being prepared and will be available soon. Stay tuned!
+- [DLPFC (Visium)](https://research.libd.org/spatialLIBD/)
+- [Healthy Lung (IMC)](https://doi.org/10.5281/zenodo.6376766)
+- [Adult Mouse Brain (MERFISH)](https://alleninstitute.github.io/abc_atlas_access/notebooks/zhuang_merfish_tutorial.html)
+- [UPMC-HNC (CODEX)](https://app.enablemedicine.com/portal/atlas-library/studies/92394a9f-6b48-4897-87de-999614952d94)
+- DKD Kidney, TR Kidney, UCSF Derm, Stanford-PC (CODEX): raw files are currently being assembled and will be available soon. Stay tuned!
 
 ## Requirements
 
@@ -39,4 +40,4 @@ Datasets used in the SCGP manuscript:
 - umap-learn
 - igraph
 - leidenalg
-- emobject >= 0.7.3 or anndata
+- anndata or emobject >= 0.7.3
