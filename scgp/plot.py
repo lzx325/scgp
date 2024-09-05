@@ -36,7 +36,7 @@ def plot_all_regions_with_annotations(annotation_dict,
     for obj in objs:
         region_id = get_name(obj)
         node_gp = [annotation_dict[(region_id, cell_id)] for cell_id in get_cell_ids(obj)]
-        if np.issubdtype(type(node_gp[0]), int):
+        if np.issubdtype(type(node_gp[0]), np.integer):
             node_colors = [matplotlib.cm.tab20(i % 20) for i in node_gp]
         elif isinstance(node_gp[0], str) and len(node_gp[0]) == 7 and node_gp[0].startswith('#'):
             node_colors = node_gp
