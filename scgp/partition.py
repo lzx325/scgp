@@ -13,7 +13,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from scgp.neighborhood import build_feature_knn_umap, construct_graph
 
 
-def leiden_partition(G, rp=0.1, **kwargs):
+def leiden_partition(G, rp=0.1, seed=None, **kwargs):
     """Leiden partition wrapper
 
     Args:
@@ -26,7 +26,7 @@ def leiden_partition(G, rp=0.1, **kwargs):
     _G = ig.Graph.from_networkx(G)
     edge_weights = [e[2]['weight'] if 'weight' in e[2] else 1. for e in G.edges.data()]
     partition = la.find_partition(
-        _G, la.CPMVertexPartition, weights=edge_weights, resolution_parameter=rp, **kwargs)
+        _G, la.CPMVertexPartition, weights=edge_weights, resolution_parameter=rp, seed=seed, **kwargs)
     membership = partition.membership
     return membership
 
@@ -35,6 +35,7 @@ def leiden_partition_with_reference(joint_G,
                                     initial_membership=None,
                                     is_membership_fixed=None,
                                     rp=2e-4,
+                                    seed = None,
                                     **kwargs):
     """Leiden partition on target graph with reference
 
@@ -61,12 +62,14 @@ def leiden_partition_with_reference(joint_G,
         resolution_parameter=rp)
 
     optimiser = la.Optimiser()
+    if seed is not None:
+        optimiser.set_rng_seed(seed)
     optimiser.optimise_partition(partition, is_membership_fixed=is_membership_fixed)
     membership = partition.membership
     return membership
 
 
-def leiden_clustering(feature_ar, rp=0.1, k=15, seed=123, **kwargs):
+def leiden_clustering(feature_ar, rp=0.1, k=15, seed=None, **kwargs):
     """Generic leiden partition on an array of features, used for clustering
     without spatial edges
 

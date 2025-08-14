@@ -382,7 +382,7 @@ def SCGPExtension_wrapper(query_objs,
     feats = (query_feat_df, query_spatial_neighbor_df)
     model = (joint_graph, is_membership_fixed, initial_membership)
     query_gp = SCGPExtension_partition(
-        feats, model, rp=rp, smooth_level=smooth_level, smooth_iter=smooth_iter, verbose=verbose)
+        feats, model, rp=rp, smooth_level=smooth_level, smooth_iter=smooth_iter, seed=seed, verbose=verbose)
 
     t_c = time.time()
     if verbose:
@@ -399,6 +399,7 @@ def SCGPExtension_partition(feats,
                             rp=1e-3,
                             smooth_level=0,
                             smooth_iter=1,
+                            seed = None,
                             verbose=False):
     """Partitioning the joint graph defined by SCGPExt
 
@@ -418,7 +419,7 @@ def SCGPExtension_partition(feats,
     joint_graph, is_membership_fixed, initial_membership = model
 
     combined_membership = leiden_partition_with_reference(
-        joint_graph, initial_membership=initial_membership, is_membership_fixed=is_membership_fixed, rp=rp)
+        joint_graph, initial_membership=initial_membership, is_membership_fixed=is_membership_fixed, rp=rp, seed=seed)
     query_membership = combined_membership[:query_feat_df.shape[0]]
 
     query_membership = remove_isolated_patch(query_membership)

@@ -532,7 +532,7 @@ def SCGP_wrapper(objs,
         all_neighbors_df, feature_df=features, weighted=True, normalize=True)
     scgp_membership = SCGP_partition(
         (features, all_neighbors_df), nx_graph, rp=rp, smooth_level=smooth_level,
-        smooth_iter=smooth_iter, verbose=verbose)
+        smooth_iter=smooth_iter, seed=seed, verbose=verbose)
     t_c = time.time()
     if verbose:
         print("Featurization takes %.2fs, Clustering takes %.2fs" % (t_f - t0, t_c - t_f))
@@ -548,6 +548,7 @@ def SCGP_partition(feats,
                    rp=1e-3,
                    smooth_level=0,
                    smooth_iter=1,
+                   seed=None,
                    verbose=False):
     """Partitioning hybrid graphs defined by SCGP
 
@@ -563,7 +564,7 @@ def SCGP_partition(feats,
         dict: dict of cell(node) name: SCGP partition id
     """
     features, all_neighbors_df = feats
-    membership = leiden_partition(nx_graph, rp=rp)
+    membership = leiden_partition(nx_graph, rp=rp, seed=seed)
     membership = remove_isolated_patch(membership)
     for _ in range(smooth_iter):
         membership = smooth_spatially_isolated_patch(
